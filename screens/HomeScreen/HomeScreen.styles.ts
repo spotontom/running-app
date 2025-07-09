@@ -51,18 +51,34 @@ const styles = StyleSheet.create({
       width: "100%",
     },
     activityItem: {
-      backgroundColor: "rgba(255, 255, 255, 0.8)",
-      borderRadius: 8,
+      backgroundColor: "rgba(255, 255, 255, 0.6)", // More transparent
+      borderRadius: 10,
       padding: 10,
-      marginVertical: 5,
+      marginVertical: 6,
+      marginHorizontal: 10,
+      flexDirection: "row",
+      alignSelf: "center",
+      width: "85%",
+      justifyContent: "space-between",
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 3,
+      height: 60, // Smaller height
     },
     activityText: {
-      fontSize: 16,
-      color: "#333",
+      fontSize: 14,
+      fontWeight: "500",
+      color: "#222",
     },
     activitySubText: {
-      fontSize: 14,
-      color: "#555",
+      fontSize: 12,
+      color: "#444",
+    },
+    scrollableListContainer: {
+      maxHeight: 250, // adjusts how many fit — try 250–300
     },
     progressContainer: {
       position: "absolute",

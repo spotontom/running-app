@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import {
   ImageBackground,
-  StyleSheet,
   Text,
   View,
   FlatList,
@@ -12,18 +13,33 @@ import { useClock } from "../../utils/clockUtils";
 import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { db } from "../../firebase/firebaseConfig";
+import { collection, getDocs } from "@firebase/firestore";
+import { Run } from "../../types/types";
+import { getRunsForCurrentUser } from "../../firebase/firebaseUtils";
 import styles from "./HomeScreen.styles";
+
 
 export default function HomeScreen() {
   const time = useClock();
   const navigation = useNavigation();
+  
+  
+  const [runData, setRunData] = useState<Run[]>([]);
 
-  // Mock data for recent activities
-  const runData = [
-    { date: "12/22", distance: 3.2, time: "25:30", pace: "7:58" },
-    { date: "12/21", distance: 5.0, time: "40:10", pace: "8:02" },
-    { date: "12/20", distance: 2.5, time: "20:45", pace: "8:18" },
-  ];
+  useFocusEffect(
+    useCallback(() => {
+      const fetchRuns = async () => {
+        try {
+          const runs = await getRunsForCurrentUser();
+          setRunData(runs);
+        } catch (error) {
+          console.log("Error fetching runs: ", error);
+        }
+      };
+      fetchRuns();
+    }, [])
+  );
 
   // Mock calories and distance
   const weeklyCaloriesBurned = 400;
@@ -59,19 +75,21 @@ export default function HomeScreen() {
         {/* Recent Activity Feed */}
         <View style={styles.recentActivityContainer}>
           <Text style={styles.subtitle}>Recent Runs</Text>
-          <FlatList
-            data={runData}
-            keyExtractor={(item) => item.date}
-            renderItem={({ item }) => (
-              <View style={styles.activityItem}>
-                <Text style={styles.activityText}>
-                  {item.date} - {item.distance} miles
-                </Text>
-                <Text style={styles.activitySubText}>Avg Pace: {item.pace}</Text>
-              </View>
-            )}
-          />
-        </View>
+          <View style={styles.scrollableListContainer}>
+            <FlatList
+              data={runData}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <View style={styles.activityItem}>
+                  <Text style={styles.activityText}>🗓 {item.date}</Text>
+                  <Text style={styles.activityText}>🏁 {item.distance} mi</Text>
+                  <Text style={styles.activitySubText}>Total Time: {item.time}</Text>
+                </View>
+              )}
+              showsVerticalScrollIndicator={false}
+            />
+            </View>
+          </View>
       </View>
       </SafeAreaView>
 

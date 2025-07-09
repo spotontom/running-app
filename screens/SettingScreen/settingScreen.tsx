@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   ImageBackground,
-  StyleSheet,
   Text,
   View,
   TextInput,
@@ -12,6 +11,9 @@ import {
 import images from "../../constants/running-images";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from "./SettingScreen.styles";
+import { auth } from "../../firebase/firebaseConfig";
+import { signOut } from "firebase/auth";
+import { useNavigation } from "@react-navigation/native";
 
 export default function SettingsScreen() {
   // State for profile settings
@@ -31,6 +33,17 @@ export default function SettingsScreen() {
     splits: false,
     distance: true,
   });
+  const navigation = useNavigation();
+
+  // function for signout with firebase
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      console.log("User signed out");
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
+  };
 
   return (
     <ImageBackground
@@ -132,13 +145,15 @@ export default function SettingsScreen() {
             </View>
           </View>
         )}
-
+        <TouchableOpacity onPress={handleSignOut} style={styles.button}>
+        <Text style={styles.buttonText} >Sign Out</Text>
+        </TouchableOpacity>
         {/* App Info */}
         <Text style={styles.sectionTitle}>App Info</Text>
-        <Text style={styles.appInfo}>Version: 0.1.1</Text>
+        <Text style={styles.appInfo}>Version: 0.2.1</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => alert("Contact us at spotontom1@gmail.com")}
+          onPress={() => alert("Contact @ spotontom1@gmail.com")}
         >
           <Text style={styles.buttonText}>Contact Support</Text>
         </TouchableOpacity>
