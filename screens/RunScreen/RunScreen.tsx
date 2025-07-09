@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import WeeklyProgressGauge from "../../components/gaugeComponent";
 import images from "../../constants/running-images";
 import styles from "../RunScreen/RunScreen.styles";
+import MapView from 'react-native-maps';
 import * as Location from "expo-location";
 import { saveRun } from "../../firebase/firebaseUtils";
 
@@ -176,6 +177,18 @@ export default function RunScreen() {
                 <Text style={styles.statLabel}>Avg Pace</Text>
               </View>
             </View>
+
+            {/* MAP VIEW */}
+            <MapView
+              style={{ height: 300 }}
+              initialRegion={{
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+            />
+
             {/* CONDITIONAL RUN SUMMARY*/}
           {runSaved && (
           <View style={styles.container}>
