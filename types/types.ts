@@ -2,9 +2,9 @@ export type Run = {
     id: string;
     uid: string;
     date: string;
-    distance: number;
+    totalDistance: number;
     time: string;
-    pace: string;
+    pace?: string;
     heartRate?: number;
     calories?: number;
     splits?: string[];

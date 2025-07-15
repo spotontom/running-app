@@ -13,17 +13,15 @@ import { useClock } from "../../utils/clockUtils";
 import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { db } from "../../firebase/firebaseConfig";
-import { collection, getDocs } from "@firebase/firestore";
+import { Swipeable } from 'react-native-gesture-handler';
+import { deleteRunById } from "../../firebase/firebaseUtils";
 import { Run } from "../../types/types";
 import { getRunsForCurrentUser } from "../../firebase/firebaseUtils";
 import styles from "./HomeScreen.styles";
 
-
 export default function HomeScreen() {
   const time = useClock();
   const navigation = useNavigation();
-  
   
   const [runData, setRunData] = useState<Run[]>([]);
 
@@ -41,11 +39,32 @@ export default function HomeScreen() {
     }, [])
   );
 
+  const handleDeleteRun = async (id: string) => {
+    setRunData((prevRuns) => prevRuns.filter((run) => run.id !== id));
+    await deleteRunById(id);
+  };
+
+  const renderRightActions = (onDelete: () => void) => (
+    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <TouchableOpacity
+        onPress={onDelete}
+        style={{
+          backgroundColor: 'red',
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          borderRadius: 20,
+          marginRight: 10,
+        }}
+      >
+        <Text style={{ color: 'white', fontWeight: 'bold' }}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   // Mock calories and distance
   const weeklyCaloriesBurned = 400;
   const weeklyCaloriesGoal = 500;
   const progress = weeklyCaloriesBurned / weeklyCaloriesGoal;
-  const totalDistance = runData.reduce((acc, item) => acc + item.distance, 0);
 
   return (
     <ImageBackground
@@ -68,26 +87,33 @@ export default function HomeScreen() {
         {/* Page Title */}
         <Text style={styles.title}>Tom's Mile Tracker</Text>
         {/* Total Distance */}
-        <Text style={styles.distance}>
-          Total Distance: {totalDistance.toFixed(1)} miles
-        </Text>
+        {/*<Text style={styles.distance}>
+          Total Distance: {item.totalDistance} miles
+        </Text> */}
 
         {/* Recent Activity Feed */}
         <View style={styles.recentActivityContainer}>
           <Text style={styles.subtitle}>Recent Runs</Text>
           <View style={styles.scrollableListContainer}>
-            <FlatList
-              data={runData}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
+          <FlatList
+            data={runData}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <Swipeable
+                renderRightActions={() =>
+                  renderRightActions(() => handleDeleteRun(item.id))
+                }
+                overshootRight={false}
+              >
                 <View style={styles.activityItem}>
                   <Text style={styles.activityText}>🗓 {item.date}</Text>
-                  <Text style={styles.activityText}>🏁 {item.distance} mi</Text>
-                  <Text style={styles.activitySubText}>Total Time: {item.time}</Text>
+                  <Text style={styles.activityText}>🏁 {Number(item.totalDistance).toFixed(2)} mi</Text>
+                  <Text style={styles.activitySubText}>Time: {item.time}</Text>
                 </View>
-              )}
-              showsVerticalScrollIndicator={false}
-            />
+              </Swipeable>
+            )}
+            showsVerticalScrollIndicator={false}
+          />
             </View>
           </View>
       </View>

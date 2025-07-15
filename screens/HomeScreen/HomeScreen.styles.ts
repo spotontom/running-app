@@ -91,6 +91,36 @@ const styles = StyleSheet.create({
       color: "white",
       marginBottom: 0,
     },
+    rowFront: {
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      borderRadius: 10,
+      padding: 12,
+      marginVertical: 5,
+      marginHorizontal: 10,
+      overflow: 'hidden',
+    },
+    rowBack: {
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      marginVertical: 5,
+      marginHorizontal: 10,
+      borderRadius: 10,
+    },
+    backRightBtn: {
+      alignItems: 'center',
+      backgroundColor: 'red',
+      justifyContent: 'center',
+      borderRadius: 10,
+      width: 75,
+      height: '100%',
+    },
+    deleteText: {
+      color: '#fff',
+      fontWeight: 'bold',
+    },
   });
 
 export default styles;

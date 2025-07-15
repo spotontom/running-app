@@ -3,6 +3,7 @@ import { db } from "./firebaseConfig";
 import { collection, doc, getDocs, orderBy, setDoc, query, where } from 'firebase/firestore';
 import { generateUUID } from "../types/generateUUID";
 import { auth } from "./firebaseConfig";
+import { deleteDoc } from "firebase/firestore"; 
 
 export const saveRun = async (partialRunData: Omit<Run, "id" | "createdAt">) => {
     const id = await generateUUID();
@@ -38,3 +39,12 @@ export const getRunsForCurrentUser = async (): Promise<Run[]> => {
 
     return runs;
 }
+
+export const deleteRunById = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "runs", id));
+      console.log(`✅ Run with ID ${id} deleted from Firebase`);
+    } catch (error) {
+      console.error("❌ Error deleting run:", error);
+    }
+  };
