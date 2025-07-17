@@ -25,6 +25,7 @@ export default function HomeScreen() {
   
   const [runData, setRunData] = useState<Run[]>([]);
 
+  // pulling runs from database
   useFocusEffect(
     useCallback(() => {
       const fetchRuns = async () => {
@@ -44,6 +45,7 @@ export default function HomeScreen() {
     await deleteRunById(id);
   };
 
+  // allows for swiping left to delete run
   const renderRightActions = (onDelete: () => void) => (
     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity

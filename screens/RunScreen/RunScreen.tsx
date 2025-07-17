@@ -13,6 +13,7 @@ import images from "../../constants/running-images";
 import styles from "../RunScreen/RunScreen.styles";
 import MapView from 'react-native-maps';
 import * as Location from "expo-location";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import KalmanFilter from 'kalmanjs';
 import { announceMileSplit } from "../../utils/speechMile";
 import { getPreciseDistance } from 'geolib';
@@ -38,6 +39,32 @@ export default function RunScreen() {
   const lastLocationRef = useRef<Location.LocationObject | null>(null);
   const weeklyProgress = 12; // Example weekly mileage
   const weeklyGoal = 20; // Weekly mileage goal
+  const [audioSettings, setAudioSettings] = useState({
+    audioFeedbackEnabled: false,
+    feedbackMetrics: {
+      pace: false,
+      splits: false,
+      distance: false,
+    },
+  });
+
+  // Settings preferences
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('audioSettings');
+        console.log("Raw Settings:", stored);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setAudioSettings(parsed);
+          console.log("Loaded audio settings:", parsed);
+        }
+      } catch (e) {
+        console.error("Failed to load audio settings:", e);
+      }
+    };
+    loadSettings();
+  }, []);
 
   // Timer logic
   useEffect(() => {
@@ -118,10 +145,10 @@ export default function RunScreen() {
             console.log("Updated total distance:", updatedDistance.toFixed(4));
             
             // Trigger a split at every new whole mile & tell user
-            if (Math.floor(updatedDistance) > Math.floor(prevDistance)) {
-              const currentMile = Math.floor(updatedDistance);
+            if (updatedDistance > 0.01 && prevDistance <= 0.01) {
+              const currentMile = 1;
               console.log(`🎯 Real mile ${currentMile} reached at ${updatedDistance.toFixed(2)} miles`);
-              announceMileSplit(currentMile, mileTime);
+              announceMileSplit(currentMile, mileTime, audioSettings);
               setSplits((prevSplits) => [...prevSplits, formatTime(mileTime)]);
               setMileTime(0);
             }

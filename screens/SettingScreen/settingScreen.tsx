@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from "./SettingScreen.styles";
 import { auth } from "../../firebase/firebaseConfig";
 import { signOut } from "firebase/auth";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
 
 export default function SettingsScreen() {
@@ -34,6 +35,15 @@ export default function SettingsScreen() {
     distance: true,
   });
   const navigation = useNavigation();
+
+  const saveAudioSettings = async (nextAudioSettings) => {
+    try {
+      await AsyncStorage.setItem('audioSettings', JSON.stringify(nextAudioSettings));
+      console.log("✅ Settings saved:", nextAudioSettings);
+    } catch (e) {
+      console.error("❌ Failed to save settings:", e);
+    }
+  };
 
   // function for signout with firebase
   const handleSignOut = async () => {
@@ -111,7 +121,14 @@ export default function SettingsScreen() {
           <Text style={styles.switchLabel}>Enable Audio Feedback</Text>
           <Switch
             value={audioFeedbackEnabled}
-            onValueChange={setAudioFeedbackEnabled}
+            onValueChange={(value) => {
+              const nextSettings = {
+                audioFeedbackEnabled: value,
+                feedbackMetrics,
+              };
+              setAudioFeedbackEnabled(value);
+              saveAudioSettings(nextSettings);
+            }}
           />
         </View>
         {audioFeedbackEnabled && (
@@ -120,27 +137,42 @@ export default function SettingsScreen() {
               <Text style={styles.switchLabel}>Include Pace</Text>
               <Switch
                 value={feedbackMetrics.pace}
-                onValueChange={(value) =>
-                  setFeedbackMetrics({ ...feedbackMetrics, pace: value })
-                }
+                onValueChange={(value) => {
+                  const nextMetrics = { ...feedbackMetrics, pace: value };
+                  setFeedbackMetrics(nextMetrics);
+                  saveAudioSettings({
+                    audioFeedbackEnabled,
+                    feedbackMetrics: nextMetrics,
+                  });
+                }}
               />
             </View>
             <View style={styles.switchRow}>
               <Text style={styles.switchLabel}>Include Splits</Text>
               <Switch
                 value={feedbackMetrics.splits}
-                onValueChange={(value) =>
-                  setFeedbackMetrics({ ...feedbackMetrics, splits: value })
-                }
+                onValueChange={(value) => {
+                  const nextMetrics = { ...feedbackMetrics, splits: value };
+                  setFeedbackMetrics(nextMetrics);
+                  saveAudioSettings({
+                    audioFeedbackEnabled,
+                    feedbackMetrics: nextMetrics,
+                  });
+                }}
               />
             </View>
             <View style={styles.switchRow}>
               <Text style={styles.switchLabel}>Include Distance</Text>
               <Switch
                 value={feedbackMetrics.distance}
-                onValueChange={(value) =>
-                  setFeedbackMetrics({ ...feedbackMetrics, distance: value })
-                }
+                onValueChange={(value) => {
+                  const nextMetrics = { ...feedbackMetrics, distance: value };
+                  setFeedbackMetrics(nextMetrics);
+                  saveAudioSettings({
+                    audioFeedbackEnabled,
+                    feedbackMetrics: nextMetrics,
+                  });
+                }}
               />
             </View>
           </View>

@@ -27,6 +27,7 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // user auth 
   const handleSubmit = async () => {
     setLoading(true);
     setError('');

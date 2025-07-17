@@ -1,22 +1,57 @@
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 
-export const announceMileSplit = async (mile: number, timeInSeconds: number) => {
-  const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = Math.round(timeInSeconds % 60);
-  const message = `Mile ${mile} complete in ${minutes} minutes, ${seconds} seconds`;
+type AudioSettings = {
+  audioFeedbackEnabled: boolean;
+  feedbackMetrics: {
+    pace?: boolean;
+    splits?: boolean;
+    distance?: boolean;
+  };
+};
 
-  console.log("🔊 Speaking split:", message);
+export const announceMileSplit = async (
+  mile: number,
+  timeInSeconds: number,
+  settings?: AudioSettings
+) => {
+  console.log("📢 announceMileSplit called with:", { mile, timeInSeconds, settings });
+
+  // Only gate speech entirely if audioFeedbackEnabled is false
+  if (!settings?.audioFeedbackEnabled) {
+    console.log("🔕 Audio feedback disabled globally.");
+    return;
+  }
+
+  // Build message dynamically based on enabled metrics
+  const messages = [`Mile ${mile} complete`];
+
+  if (settings.feedbackMetrics?.distance) {
+    messages.push(`You've run ${mile} mile${mile > 1 ? 's' : ''}`);
+  }
+
+  if (settings.feedbackMetrics?.splits) {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.round(timeInSeconds % 60);
+    messages.push(`in ${minutes} minutes and ${seconds} seconds`);
+  }
+
+  if (settings.feedbackMetrics?.pace) {
+    // Optional: you could pass pace as an argument if calculated
+    // messages.push(`Your pace is ...`);
+  }
+
+  const fullMessage = messages.join('. ');
 
   try {
-    // 🔧 Force audio to play even if iPhone is in silent mode
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
       staysActiveInBackground: true,
     });
 
-    // 🎤 Speak the message
-    Speech.speak(message, {
+    console.log("🔊 Speaking:", fullMessage);
+
+    Speech.speak(fullMessage, {
       rate: 0.9,
       pitch: 1.0,
       volume: 1.0,
