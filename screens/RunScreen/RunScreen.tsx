@@ -145,8 +145,8 @@ export default function RunScreen() {
             console.log("Updated total distance:", updatedDistance.toFixed(4));
             
             // Trigger a split at every new whole mile & tell user
-            if (updatedDistance > 0.01 && prevDistance <= 0.01) {
-              const currentMile = 1;
+            if (Math.floor(updatedDistance) > Math.floor(prevDistance)) {
+              const currentMile = Math.floor(updatedDistance);
               console.log(`🎯 Real mile ${currentMile} reached at ${updatedDistance.toFixed(2)} miles`);
               announceMileSplit(currentMile, mileTime, audioSettings);
               setSplits((prevSplits) => [...prevSplits, formatTime(mileTime)]);
