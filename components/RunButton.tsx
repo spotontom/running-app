@@ -42,7 +42,7 @@ export default function StyledRunButton() {
   const styles = StyleSheet.create({
     runButton: {
       position: "absolute",
-      bottom: 130,
+      bottom: 105,
       alignSelf: "center",
       width: 85,
       height: 85,

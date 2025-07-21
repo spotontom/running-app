@@ -8,10 +8,8 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import images from "../../constants/running-images"
 import { useClock } from "../../utils/clockUtils";
-import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Swipeable } from 'react-native-gesture-handler';

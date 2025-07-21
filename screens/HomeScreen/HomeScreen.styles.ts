@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
       color: "#444",
     },
     scrollableListContainer: {
-      maxHeight: 250, // adjusts how many fit — try 250–300
+      maxHeight: 360, // adjusts how many fit — try 250–300
     },
     progressContainer: {
       position: "absolute",
