@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ImageBackground,
   Text,
@@ -22,11 +22,6 @@ export default function SettingsScreen() {
   const [age, setAge] = useState("25");
   const [weight, setWeight] = useState("160");
   const [height, setHeight] = useState("5'9");
-
-  // State for notification preferences
-  const [remindersEnabled, setRemindersEnabled] = useState(true);
-  const [motivationEnabled, setMotivationEnabled] = useState(false);
-
   // State for audio feedback
   const [audioFeedbackEnabled, setAudioFeedbackEnabled] = useState(true);
   const [feedbackMetrics, setFeedbackMetrics] = useState({
@@ -34,6 +29,40 @@ export default function SettingsScreen() {
     splits: false,
     distance: true,
   });
+  const [dailyCalorieGoal, setDailyCalorieGoal] = useState("500");
+const [weeklyMileageGoal, setWeeklyMileageGoal] = useState("500");
+// Save settings to AsyncStorage
+useEffect(() => {
+  const loadGoals = async () => {
+    try {
+      const storedGoals = await AsyncStorage.getItem("userGoals");
+      if (storedGoals) {
+        const { weeklyMileageGoal, dailyCalorieGoal } = JSON.parse(storedGoals);
+        if (dailyCalorieGoal) setDailyCalorieGoal(dailyCalorieGoal.toString());
+        if (weeklyMileageGoal) setWeeklyMileageGoal(weeklyMileageGoal.toString());
+      }
+    } catch (e) {
+      console.error("Failed to load goals", e);
+    }
+  };
+  loadGoals();
+}, []);
+
+const saveGoals = async () => {
+  try {
+    await AsyncStorage.setItem(
+      "userGoals",
+      JSON.stringify({
+        weeklyMileageGoal: Number(weeklyMileageGoal),
+        dailyCalorieGoal: Number(dailyCalorieGoal),
+      })
+    );
+    console.log("Goal saved!");
+  } catch (e) {
+    console.error("Failed to save goals", e);
+  }
+};
+
   const navigation = useNavigation();
 
   const saveAudioSettings = async (nextAudioSettings) => {
@@ -97,23 +126,28 @@ export default function SettingsScreen() {
           placeholder="Height"
           placeholderTextColor="gray"
         />
-
-        {/* Notification Preferences */}
-        <Text style={styles.sectionTitle}>Notification Preferences</Text>
-        <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>Enable Reminders</Text>
-          <Switch
-            value={remindersEnabled}
-            onValueChange={setRemindersEnabled}
-          />
-        </View>
-        <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>Motivational Tips</Text>
-          <Switch
-            value={motivationEnabled}
-            onValueChange={setMotivationEnabled}
-          />
-        </View>
+        {/* Calorie Preference*/}
+        <Text style={styles.sectionTitle}>Weekly Mileage Goal</Text>
+        <TextInput
+          style={styles.input}
+          value={weeklyMileageGoal}
+          onChangeText={setWeeklyMileageGoal}
+          placeholder="Weekly Mileage Goal"
+          keyboardType="numeric"
+          placeholderTextColor="gray"
+        />
+        {/*<Text style={styles.sectionTitle}>Weekly Caloric Goal</Text>
+        <TextInput
+          style={styles.input}
+          value={dailyCalorieGoal}
+          onChangeText={setDailyCalorieGoal}
+          placeholder="Daily Calorie Goal"
+          keyboardType="numeric"
+          placeholderTextColor="gray"
+        /> */}
+        <TouchableOpacity style={styles.button} onPress={saveGoals}>
+          <Text style={styles.buttonText}>Save Goals</Text>
+        </TouchableOpacity>
 
         {/* Audio Feedback */}
         <Text style={styles.sectionTitle}>Audio Feedback</Text>

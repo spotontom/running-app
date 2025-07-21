@@ -85,6 +85,21 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: "#666",
   },
+  mapContainer: {
+    marginHorizontal: 16,
+    marginTop: 20,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4, // Android shadow
+  },
+  map: {
+    width: '100%',
+    height: 250,
+  },
 });
 
 export default styles;

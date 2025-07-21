@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import KalmanFilter from 'kalmanjs';
 import { announceMileSplit } from "../../utils/speechMile";
 import { getPreciseDistance } from 'geolib';
-import { saveRun } from "../../firebase/firebaseUtils";
+import { saveRun,getRunsForCurrentUser } from "../../firebase/firebaseUtils";
 
 // kalman filter consts 
 const latFilter = new KalmanFilter();
@@ -37,8 +37,61 @@ export default function RunScreen() {
   const [lastLocation, setLastLocation] = useState<Location.LocationObject | null>(null);
   const [mileTime, setMileTime] = useState<number>(0);
   const lastLocationRef = useRef<Location.LocationObject | null>(null);
-  const weeklyProgress = 12; // Example weekly mileage
-  const weeklyGoal = 20; // Weekly mileage goal
+  const [weeklyProgress, setWeeklyProgress] = useState(0);
+  const [weeklyGoal, setWeeklyGoal] = useState<number>(10);
+  
+  // checks mileage for the past 7 days
+  useEffect(() => {
+    const calculateWeeklyProgress = async () => {
+      try {
+        const allRuns = await getRunsForCurrentUser();
+        const today = new Date();
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(today.getDate() - 6);
+  
+        const thisWeekRuns = allRuns.filter((run) => {
+          const runDate = new Date(run.date);
+          return runDate >= oneWeekAgo && runDate <= today;
+        });
+  
+        const totalMileage = thisWeekRuns.reduce((sum, run) => {
+          return sum + (run.totalDistance || 0);
+        }, 0);
+  
+        setWeeklyProgress(Number(totalMileage.toFixed(2)));
+      } catch (e) {
+        console.error("❌ Failed to calculate weekly mileage:", e);
+      }
+    };
+  
+    const unsubscribe = navigation.addListener("focus", calculateWeeklyProgress);
+    return unsubscribe;
+  }, [navigation]);
+
+useEffect(() => {
+  const loadGoal = async () => {
+    try {
+      const stored = await AsyncStorage.getItem("userGoals");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setWeeklyGoal(Number(parsed.weeklyMileageGoal));
+        console.log("📥 Loaded weekly goal:", parsed.weeklyMileageGoal);
+      }
+    } catch (e) {
+      console.error("❌ Failed to load weekly goal:", e);
+    }
+  };
+
+  const unsubscribe = navigation.addListener("focus", loadGoal); // triggers reload on screen focus
+
+  return unsubscribe;
+}, [navigation]);
+  const [mapRegion, setMapRegion] = useState({
+    latitude: 37.78825,      // default fallback
+    longitude: -122.4324,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  });
   const [audioSettings, setAudioSettings] = useState({
     audioFeedbackEnabled: false,
     feedbackMetrics: {
@@ -79,6 +132,26 @@ export default function RunScreen() {
     }
     return () => clearInterval(timer);
   }, [isRunning]);
+
+  // Live location
+  useEffect(() => {
+    const getInitialLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      setMapRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    };
+    getInitialLocation();
+  }, []);
+  
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -256,6 +329,16 @@ export default function RunScreen() {
               </Text>
             )}
             </View>
+            
+            {/* MAP VIEW */}
+            <View style={styles.mapContainer}>
+              <MapView
+                style={styles.map}
+                region={mapRegion}
+                showsUserLocation={true}
+                followsUserLocation={true}
+              />
+            </View>
 
             {/* Weekly Progress Gauge */}
             <WeeklyProgressGauge progress={weeklyProgress} goal={weeklyGoal} />
@@ -282,16 +365,7 @@ export default function RunScreen() {
               </View>
             </View>
 
-            {/* MAP VIEW */}
-            <MapView
-              style={{ height: 300 }}
-              initialRegion={{
-                latitude: 37.78825,
-                longitude: -122.4324,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            />
+  
 
             {/* CONDITIONAL RUN SUMMARY*/}
           {runSaved && (
