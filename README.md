@@ -1,6 +1,6 @@
 # 🏃 Tom's Mile Tracker
 
-A sleek, GPS-powered running tracker built in React Native with Firebase integration. This app logs real-time runs, calculates distances and splits, stores user data securely, and visualizes weekly progress — all wrapped in a clean, mobile-first interface.
+A GPS-powered running app built in React Native with Firebase integration. This app logs real-time runs, calculates distances and splits, stores user data securely, offers in-app music, and visualizes weekly progress — all wrapped in a clean, mobile-first interface.
 
 ---
 
@@ -9,7 +9,7 @@ A sleek, GPS-powered running tracker built in React Native with Firebase integra
 - **React Native** (with Expo SDK 53)
 - **Firebase** (Auth + Firestore)
 - **TypeScript** (Overall code structure)
-- **Expo** (expo-maps + UI features)
+- **Expo** (expo-maps + UI features + expo-audio)
 - **KalmanJS** (GPS smoothing)
 - **AsyncStorage** (local settings/goals)
 - **Geolib** (distance calculation)
@@ -22,6 +22,7 @@ A sleek, GPS-powered running tracker built in React Native with Firebase integra
 - ✅ Distance calculation with smoothed coordinates
 - ✅ Automatic mile splits with audio announcements
 - ✅ Secure run storage tied to authenticated user accounts
+- ✅ Plays music while tracking runs
 - ✅ Weekly mileage goal and progress tracker
 - ✅ Mobile-friendly UI with live map and stats
 
@@ -39,9 +40,11 @@ Then start the app:
 npx expo start
 
 🗂️ Project Structure
+/screens/LoginScreen.tsx Login & Sign up Page
+
 /screens/RunScreen.tsx – live run tracking logic
 
-/screens/HomeScreen.tsx – home UI and weekly summary
+/screens/HomeScreen.tsx – home UI 
 
 /firebase/firebaseUtils.ts – Firebase logic (save/load/delete runs)
 
