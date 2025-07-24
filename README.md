@@ -1,6 +1,6 @@
 # 🏃 Tom's Mile Tracker
 
-A fully iOS compatible GPS-powered running app built in React Native with Firebase integration. This app logs real-time runs, calculates distances and splits, stores user data securely, offers in-app music, and visualizes weekly progress. 
+A fully iOS compatible GPS-powered running app built in React Native & Expo with Firebase. This app logs real-time runs, calculates distances, stores user data securely, offers in-app music, and visualizes weekly progress. 
 
 ---
 
