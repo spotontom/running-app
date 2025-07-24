@@ -39,6 +39,8 @@ cd running-app
 npm install
 Then start the app:
 npx expo start
+Optional -- Download Expo Go on mobile device
+Scan Qr Code
 
 🗂️ Project Structure
 /screens/LoginScreen.tsx Login & Sign up Page
